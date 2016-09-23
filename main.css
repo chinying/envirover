@@ -1,0 +1,25 @@
+#jawbreaker_container {
+  margin: auto;
+}
+
+.jawbreaker_box {
+  height: 50px;
+  width: 50px;
+  text-align: center;
+}
+
+.air_element {
+  background: #888;
+}
+
+.water_element {
+  background: #47B8DE;
+}
+
+.fire_element {
+  background: #DE6D47;
+}
+
+.solar_element {
+  background: #FFF79E;
+}

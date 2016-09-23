@@ -1,0 +1,22 @@
+{
+  "name": "envirover",
+  "authors": [
+    "Seah Chin Ying <scy.6char@gmail.com>"
+  ],
+  "description": "sgcc remake",
+  "main": "index.html",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "2.2.4",
+    "bootstrap": "^3.3.7"
+  }
+}
