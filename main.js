@@ -50,6 +50,7 @@ const pollutant = {
 };
 
 var active_pollutants = [];
+var active_renewable_energy = [];
 
 var arena_grid_positions = [];
 var pollutant_grid_positions = [];
@@ -186,9 +187,9 @@ function update_pollution() {
   const water_change = active_pollutants.filter(p => p.pollutes.includes("water")).length / level_nerf - 1.0;
   const land_change = active_pollutants.filter(p => p.pollutes.includes("land")).length / level_nerf - 1.0;
 
-  air_pollution_level += air_change;
-  water_pollution_level += water_change;
-  land_pollution_level += land_change;
+  air_pollution_level += air_pollution_level <= 0 ? 0 : air_change;
+  water_pollution_level += water_pollution_level <= 0 ? 0 : water_change;
+  land_pollution_level += land_pollution_level <= 0 ? 0 : land_change;
 
   $("#air-percentage").html(air_pollution_level);
   $("#water-percentage").html(water_pollution_level);
@@ -218,6 +219,26 @@ function add_pollutant() {
   $("#pollutants").html(pollutant_contents.join(", "));
 }
 
+function check_resource_req(name) {
+  const air = parseInt($("#air_score").html(), 10);
+  const water = parseInt($("#water_score").html(), 10);
+  const fire = parseInt($("#fire_score").html(), 10);
+  const solar = parseInt($("#solar_score").html(), 10);
+  const r = renewable_energy[name].resource_req;
+  if (air - r[0] < 0 || water - r[1] < 0 || fire - r[2] < 0 || solar - r[3] < 0) {
+    console.log("not enough resource");
+    return;
+  }
+
+  active_renewable_energy.push(name);
+  $("#renewable_energy").html(active_renewable_energy.join(", "));
+
+  $("#air_score").html(air - r[0]);
+  $("#water_score").html(water - r[1]);
+  $("#fire_score").html(fire - r[2]);
+  $("#solar_score").html(solar - r[3]);
+}
+
 $(document).ready(function() {
   for (let i = 0; i<jawbreaker_rows; i++) {
     visited[i] = new Array(jawbreaker_cols);
@@ -236,5 +257,11 @@ $(document).ready(function() {
   });
   pollution_interval = setInterval(update_pollution, 1000);
   ap_interval = setInterval(add_pollutant, 5000);
+
+  $(".add_renewable_energy").click(function() {
+    const _id = $(this).attr("id").substring(4);
+    check_resource_req(_id);
+  });
+
 });
 
