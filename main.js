@@ -13,6 +13,8 @@ var land_pollution_level = 50;
 
 var level_nerf = 5;
 
+var pollution_interval;
+var ap_interval;
 
 const resource = {
   "air" : ["air"],
@@ -176,6 +178,7 @@ function update_score(type, change) {
 }
 
 var check_winstate = () => { return (air_pollution_level < 10 && water_pollution_level < 10 && land_pollution_level < 10);};
+var check_gameover = () => { return (air_pollution_level > 100 || water_pollution_level > 100 || land_pollution_level > 100);};
 
 function update_pollution() {
   // foreach pollutant change the rate
@@ -190,6 +193,18 @@ function update_pollution() {
   $("#air-percentage").html(air_pollution_level);
   $("#water-percentage").html(water_pollution_level);
   $("#land-percentage").html(land_pollution_level);
+
+  if (check_winstate()) {
+    console.log('great job');
+    // proceed to next level
+  }
+
+  if (check_gameover()) {
+    console.log('game over');
+    clearInterval(ap_interval);
+    clearInterval(pollution_interval);
+  }
+
 }
 
 function add_pollutant() {
@@ -219,7 +234,7 @@ $(document).ready(function() {
     update_cells();
     reset_visited_state();
   });
-  var pollution_interval = setInterval(update_pollution, 1000);
-  var ap_interval = setInterval(add_pollutant, 5000);
+  pollution_interval = setInterval(update_pollution, 1000);
+  ap_interval = setInterval(add_pollutant, 5000);
 });
 
