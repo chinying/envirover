@@ -13,11 +13,27 @@ var land_pollution_level = 50;
 
 var level_nerf = 5;
 
-const renewable_energy = {
+
+const resource = {
   "air" : ["air"],
   "water" : ["water"],
   "fire" : ["fire"],
   "solar" : ["solar"]
+};
+
+const renewable_energy = {
+  "wind_turbine" : {
+    "name": "wind_turbine",
+    "resource_req" : [8, 5, 5, 5] // air, water, fire, solar
+  },
+  "hydroelectric_dam" : {
+    "name": "hydroelectric_dam",
+    "resource_req" : [5, 8, 5, 5]
+  },
+  "solar_panel" : {
+    "name": "solar_panel",
+    "resource_req" : [5, 5, 5, 8]
+  }
 };
 
 const pollutant = {
@@ -41,7 +57,7 @@ function random_key(obj) {
   return obj[keys[Math.floor(keys.length*Math.random())]];
 }
 
-const random_element = () => { return random_key(renewable_energy)[0];};
+const random_element = () => { return random_key(resource)[0];};
 const random_pollutant  = () => { return random_key(pollutant);};
 
 // grid functions
