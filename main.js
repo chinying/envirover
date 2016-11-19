@@ -1,33 +1,55 @@
-const rows = 5;
-const cols = 7;
+const jawbreaker_rows = 5;
+const jawbreaker_cols = 7;
+const arena_cols = 3;
+const arena_rows = 3;
 
-var visited = new Array(rows);
+var visited = new Array(jawbreaker_rows);
 var similar_elements = 0;
 var selected_cells = {};
 
-function random_element() {
+var air_pollution_level = 50;
+var water_pollution_level = 50;
+var land_pollution_level = 50;
 
-  var renewable_energy = {
-    "air" : ["air"],
-    "water" : ["water"],
-    "fire" : ["fire"],
-    "solar" : ["solar"]
-  };
-  var keys = Object.keys(renewable_energy);
-  return renewable_energy[keys[Math.floor(keys.length*Math.random())]][0];
+var level_nerf = 5;
+
+const renewable_energy = {
+  "air" : ["air"],
+  "water" : ["water"],
+  "fire" : ["fire"],
+  "solar" : ["solar"]
+};
+
+const pollutant = {
+  "factory": {
+    "name": "factory",
+    "pollutes": ["air", "water"]
+  },
+  "garbage": {
+    "name" : "garbage",
+    "pollutes": ["land", "water"]
+  }
+};
+
+var active_pollutants = [];
+
+var arena_grid_positions = [];
+var pollutant_grid_positions = [];
+
+function random_key(obj) {
+  var keys = Object.keys(obj);
+  return obj[keys[Math.floor(keys.length*Math.random())]];
 }
 
-function remove_from_array(el, array) {
-  var index = array.indexOf(el);
-  if (index > -1) array.splice(index, 1);
-}
+const random_element = () => { return random_key(renewable_energy)[0];};
+const random_pollutant  = () => { return random_key(pollutant);};
 
 // grid functions
 function init_grid() {
   var html = '<table border="solid 1px">';
-  for (let i=0; i<rows; i++) {
+  for (let i=0; i<jawbreaker_rows; i++) {
     html += '<tr>';
-    for (let j=0; j<cols; j++) {
+    for (let j=0; j<jawbreaker_cols; j++) {
       id = i + "-" + j;
       html += '<td class="' + random_element() + '_element jawbreaker_box" id="' + id + '">A</td>';
     }
@@ -39,8 +61,8 @@ function init_grid() {
 
 function reset_visited_state() {
   similar_elements = 0;
-  for (let i=0; i<rows; i++) {
-    for (let j=0; j<cols; j++) visited[i][j] = false;
+  for (let i=0; i<jawbreaker_rows; i++) {
+    for (let j=0; j<jawbreaker_cols; j++) visited[i][j] = false;
   }
   selected_cells = {};
 }
@@ -85,9 +107,9 @@ function fetch_type(arr) {
   return false;
 }
 
-function outside_boundaries(i, j) {
-  return (i >= rows || i < 0) || (j >= cols || j < 0);
-}
+var outside_boundaries = (i, j) => {
+  return (i >= jawbreaker_rows || i < 0) || (j >= jawbreaker_cols || j < 0);
+};
 
 function update_cells() {
   Object.keys(selected_cells).forEach(function(key) {
@@ -137,9 +159,37 @@ function update_score(type, change) {
   $("#" + id).html(score);
 }
 
+var check_winstate = () => { return (air_pollution_level < 10 && water_pollution_level < 10 && land_pollution_level < 10);};
+
+function update_pollution() {
+  // foreach pollutant change the rate
+  const air_change = active_pollutants.filter(p => p.pollutes.includes("air")).length / level_nerf - 1.0;
+  const water_change = active_pollutants.filter(p => p.pollutes.includes("water")).length / level_nerf - 1.0;
+  const land_change = active_pollutants.filter(p => p.pollutes.includes("land")).length / level_nerf - 1.0;
+
+  air_pollution_level += air_change;
+  water_pollution_level += water_change;
+  land_pollution_level += land_change;
+
+  $("#air-percentage").html(air_pollution_level);
+  $("#water-percentage").html(water_pollution_level);
+  $("#land-percentage").html(land_pollution_level);
+}
+
+function add_pollutant() {
+  if (active_pollutants.length < 9) {
+    const r = random_pollutant();
+    console.log(r);
+    active_pollutants.push(r);
+  }
+  const pollutant_contents = _(active_pollutants).each().map(x => x.name);
+  //console.log(pollutant_contents);
+  $("#pollutants").html(pollutant_contents.join(", "));
+}
+
 $(document).ready(function() {
-  for (let i = 0; i<rows; i++) {
-    visited[i] = new Array(cols);
+  for (let i = 0; i<jawbreaker_rows; i++) {
+    visited[i] = new Array(jawbreaker_cols);
   }
   reset_visited_state();
 
@@ -153,5 +203,7 @@ $(document).ready(function() {
     update_cells();
     reset_visited_state();
   });
+  var pollution_interval = setInterval(update_pollution, 1000);
+  var ap_interval = setInterval(add_pollutant, 5000);
 });
 
